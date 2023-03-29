@@ -1,11 +1,22 @@
 require("dotenv").config();
 const fs = require("node:fs");
 const path = require("node:path");
-const { Client, Collection, Events, GatewayIntentBits, REST, Routes } = require("discord.js");
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
-const addxp = require("./functions/xp/addxp.js");
+const { Client, Collection, GatewayIntentBits, REST, Routes } = require("discord.js");
+const client = new Client({
+  intents: [
+    GatewayIntentBits.DirectMessages,
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildModeration,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent,
+  ],
+});
 
 client.commands = new Collection();
+
+client.on("message", (message) => {
+  console.log(message.author);
+});
 
 const commands = [];
 
@@ -21,7 +32,6 @@ for (const folder of commandFolders) {
     const filePath = path.join(commandsPath, file);
     const command = require(filePath);
 
-    // Set a new item in the Collection with the key as the command name and the value as the exported module
     if ("data" in command && "execute" in command) {
       client.commands.set(command.data.name, command);
       commands.push(command.data.toJSON());
@@ -33,17 +43,19 @@ for (const folder of commandFolders) {
   }
 }
 
-const eventsPath = path.join(__dirname, 'events');
-const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
+const eventsPath = path.join(__dirname, "events");
+const eventFiles = fs
+  .readdirSync(eventsPath)
+  .filter((file) => file.endsWith(".js"));
 
 for (const file of eventFiles) {
-	const filePath = path.join(eventsPath, file);
-	const event = require(filePath);
-	if (event.once) {
-		client.once(event.name, (...args) => event.execute(...args));
-	} else {
-		client.on(event.name, (...args) => event.execute(...args));
-	}
+  const filePath = path.join(eventsPath, file);
+  const event = require(filePath);
+  if (event.once) {
+    client.once(event.name, (...args) => event.execute(...args));
+  } else {
+    client.on(event.name, (...args) => event.execute(...args));
+  }
 }
 
 const rest = new REST({ version: "10" }).setToken(
@@ -51,20 +63,24 @@ const rest = new REST({ version: "10" }).setToken(
 );
 
 (async () => {
-	try {
-		console.log(`Started refreshing ${commands.length} application (/) commands.`);
+  try {
+    console.log(
+      `Started refreshing ${commands.length} application (/) commands.`
+    );
 
-		// The put method is used to fully refresh all commands in the guild with the current set
-		const data = await rest.put(
-			Routes.applicationCommands(process.env.DISCORD_BOT_CLIENT_ID),
-			{ body: commands },
-		);
+    // The put method is used to fully refresh all commands in the guild with the current set
+    const data = await rest.put(
+      Routes.applicationCommands(process.env.DISCORD_BOT_CLIENT_ID),
+      { body: commands }
+    );
 
-		console.log(`Successfully reloaded ${data.length} application (/) commands.`);
-	} catch (error) {
-		// And of course, make sure you catch and log any errors!
-		console.error(error);
-	}
+    console.log(
+      `Successfully reloaded ${data.length} application (/) commands.`
+    );
+  } catch (error) {
+    // And of course, make sure you catch and log any errors!
+    console.error(error);
+  }
 })();
 
 client.login(process.env.DISCORD_BOT_TOKEN);
