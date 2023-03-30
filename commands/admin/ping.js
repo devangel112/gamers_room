@@ -3,8 +3,14 @@ const { SlashCommandBuilder } = require('discord.js');
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('ping')
-		.setDescription('Se supone que debe jalar con un pong :v'),
+		.setDescription('Shows the latency'),
 	async execute(interaction) {
-		await interaction.reply('Pong!');
+		const message = await interaction.deferReply({
+			fetchReply: true
+		});
+		const newMessage = `API Latency: ${interaction.client.ws.ping} Client Ping: ${message.createdTimestamp - interaction.createdTimestamp}`;
+		await interaction.editReply({
+			content: newMessage
+		});
 	},
 };

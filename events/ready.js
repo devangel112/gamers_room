@@ -6,7 +6,7 @@ module.exports = {
 	execute(client) {
 		console.log(`Loaded successfully and logged in as ${client.user.tag}`);
         client.user.setPresence({
-            activities: [{ name: `a ser basado`, type: ActivityType.Playing }],
+            activities: [{ name: `ser basado`, type: ActivityType.Playing }],
         });
 	},
 };
