@@ -1,5 +1,5 @@
 const { Events } = require('discord.js');
-const users = require("../config/users.json");
+const users = require("../../config/users.json");
 
 module.exports = {
 	name: Events.MessageCreate,

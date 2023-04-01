@@ -4,20 +4,25 @@ const path = require("node:path");
 module.exports = (client) => {
   const events = [];
 
-  const eventsPath = path.join(__dirname, "../../events");
-  const eventFiles = fs
-    .readdirSync(eventsPath)
-    .filter((file) => file.endsWith(".js"));
+  const eventsFolderPath = path.join(__dirname, "../../events");
+  const eventsFolders = fs.readdirSync(eventsFolderPath);
 
-  for (const file of eventFiles) {
-    const filePath = path.join(eventsPath, file);
-    const event = require(filePath);
-    if (event.once) {
-      client.once(event.name, (...args) => event.execute(...args));
-      events.push(event);
-    } else {
-      client.on(event.name, (...args) => event.execute(...args));
-      events.push(event);
+  for (const folder of eventsFolders) {
+    const eventsPath = path.join(eventsFolderPath, folder);
+    const eventFiles = fs
+      .readdirSync(eventsPath)
+      .filter((file) => file.endsWith(".js"));
+
+    for (const file of eventFiles) {
+      const filePath = path.join(eventsPath, file);
+      const event = require(filePath);
+      if (event.once) {
+        client.once(event.name, (...args) => event.execute(...args));
+        events.push(event);
+      } else {
+        client.on(event.name, (...args) => event.execute(...args));
+        events.push(event);
+      }
     }
   }
 
