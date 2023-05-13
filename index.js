@@ -1,4 +1,5 @@
 require("dotenv").config();
+const { connect } = require('mongoose');
 const fs = require("node:fs");
 const path = require("node:path");
 const { Client, Collection, GatewayIntentBits } = require("discord.js");
@@ -40,3 +41,6 @@ for (const folder of functionsFolders) {
 })();
 
 client.login(process.env.DISCORD_BOT_TOKEN);
+(async () => {
+  await connect(process.env.MONGODB_TOKEN).catch(console.error);
+})();

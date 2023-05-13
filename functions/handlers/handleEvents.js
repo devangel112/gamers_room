@@ -1,5 +1,6 @@
 const fs = require("node:fs");
 const path = require("node:path");
+const { connection } = require('mongoose');
 
 module.exports = (client) => {
   const events = [];
@@ -13,16 +14,36 @@ module.exports = (client) => {
       .readdirSync(eventsPath)
       .filter((file) => file.endsWith(".js"));
 
-    for (const file of eventFiles) {
-      const filePath = path.join(eventsPath, file);
-      const event = require(filePath);
-      if (event.once) {
-        client.once(event.name, (...args) => event.execute(...args));
-        events.push(event);
-      } else {
-        client.on(event.name, (...args) => event.execute(...args));
-        events.push(event);
-      }
+    switch (folder) {
+      case "client":
+        for (const file of eventFiles) {
+          const filePath = path.join(eventsPath, file);
+          const event = require(filePath);
+          if (event.once) {
+            client.once(event.name, (...args) => event.execute(...args));
+            events.push(event);
+          } else {
+            client.on(event.name, (...args) => event.execute(...args));
+            events.push(event);
+          }
+        }
+        break;
+      case "mongo":
+        for (const file of eventFiles) {
+          const filePath = path.join(eventsPath, file);
+          const event = require(filePath);
+          if (event.once) {
+            connection.once(event.name, (...args) => event.execute(...args));
+            events.push(event);
+          } else {
+            connection.on(event.name, (...args) => event.execute(...args));
+            events.push(event);
+          }
+        }
+        break;
+
+      default:
+        break;
     }
   }
 
