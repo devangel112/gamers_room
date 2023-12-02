@@ -1,6 +1,5 @@
 const fs = require("node:fs");
 const path = require("node:path");
-const { connection } = require('mongoose');
 
 module.exports = (client) => {
   const events = [];
@@ -28,15 +27,15 @@ module.exports = (client) => {
           }
         }
         break;
-      case "mongo":
+      case "database":
         for (const file of eventFiles) {
           const filePath = path.join(eventsPath, file);
           const event = require(filePath);
           if (event.once) {
-            connection.once(event.name, (...args) => event.execute(...args));
+            //connection.once(event.name, (...args) => event.execute(...args));
             events.push(event);
           } else {
-            connection.on(event.name, (...args) => event.execute(...args));
+            //connection.on(event.name, (...args) => event.execute(...args));
             events.push(event);
           }
         }

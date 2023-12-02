@@ -17,5 +17,8 @@
     "moment": "^2.29.1",
     "mongoose": "^7.0.3",
     "mysql": "^2.18.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
   }
 }
