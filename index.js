@@ -1,5 +1,5 @@
 require("dotenv").config();
-const { connect } = require('./database/handler');
+const DBHandler = require('./database/handler.js');
 const fs = require("node:fs");
 const path = require("node:path");
 const { Client, Collection, GatewayIntentBits } = require("discord.js");
@@ -42,6 +42,16 @@ for (const folder of functionsFolders) {
 })();
 
 client.login(process.env.DISCORD_BOT_TOKEN);
+DBHandler.connect();
+
+let connection = DBHandler.getConnection();
+connection.query("SELECT * FROM guilds", (err, result) => {
+	if (err) {
+		return console.log("[Database] Error:", err.message);
+	}
+
+	console.log(result);
+});
 /* (async () => {
 	await db.connect();
 })(); */

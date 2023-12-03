@@ -1,24 +1,26 @@
 require("dotenv").config();
-const { createConnection } = require('mysql');
+const { createConnection } = require('mysql2');
 
-const connection = createConnection({
-    host: process.env.DB_HOST,
-    database: process.env.DB_NAME,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    charset: "utf8mb4_unicode_ci"
-});
+var connection;
 
-class DBHandler {
-    constructor() { }
-
-    static async returnConnection() {
-        return new Promise((resolve, reject) => {
-            try {
-                resolve({success: true, message: 'Connected Successfully', connection});
-            } catch (error) {
-                reject({success: false, message: error.message, data: {}});
-            }
-        });
-    }
+exports.connect = function () {
+    return new Promise((resolve, reject) => {
+        try {
+            connection = createConnection({
+                host: process.env.DB_HOST,
+                user: process.env.DB_USER,
+                password: "123456",
+                database: process.env.DB_NAME,
+                charset: "utf8mb4_unicode_ci"
+            });
+            console.log("[Database] Connected Successfully");
+            resolve()
+        } catch (error) {
+            reject(error);
+        }
+    });
 }
+
+exports.getConnection = function () {
+    return connection;
+};
